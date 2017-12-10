@@ -80,6 +80,7 @@ class QuotaManager(object):
 
 
 if __name__ == '__main__':
-
     qm = QuotaManager(QuotaAgent(),QuotaStorage())
+    t1 = time.time();
     qm.load_history(20170101,20171212)
+    print("spend "+str(time.time()-t1)+" seconds")
