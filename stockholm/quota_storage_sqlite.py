@@ -1,6 +1,7 @@
 import sqlite3
 import os
 import shutil
+from day_info import DayInfo
 
 
 class QuotaStorage :
@@ -42,4 +43,34 @@ class QuotaStorage :
         conn.commit()
         conn.close()
 
+    def query(self,code,start,end):
+        if start is None :
+            start = 19900101
+        if end is None :
+            end = 29900101
+
+        def dict_factory(cursor, row):
+            d = {}
+            for idx, col in enumerate(cursor.description):
+                d[col[0]] = row[idx]
+            return d
+        conn = sqlite3.connect(os.path.join(self.root, '%s.db') % code)
+        conn.row_factory = dict_factory
+        cursor = conn.cursor()
+        cursor.execute('SELECT * FROM DAY_INFO WHERE DAY >= ? AND DAY <= ?',(start,end))
+        rows = cursor.fetchall()
+        day_infos = []
+        for row in rows:
+            di = DayInfo(row["code"], row["day"], row["open"], row["close"], row["low"], row["high"],round(float( row["close"]) / (float(row["rate"])/100+1),2),
+                    row["volume"])
+            di.rate = row["rate"]
+            day_infos.append(di)
+        cursor.close()
+
+
+        conn.close()
+        return day_infos
+
+if __name__ == '__main__':
+    QuotaStorage().query("sh600600",20170901,20170904)
 
