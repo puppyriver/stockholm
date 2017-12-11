@@ -55,5 +55,6 @@ class QuotaAgent :
 
 if __name__ == '__main__':
     qa = QuotaAgent()
-    qa.fetchDayInfo("sh600600")
-    # qa.fetchHistory("sh600600",20171101,20171130)
+    #qa.fetchDayInfo("sh600600")
+    history = qa.fetchHistory("sh600600",19901101,20171130)
+    print(len(history))
