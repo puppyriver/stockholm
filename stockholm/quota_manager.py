@@ -38,6 +38,8 @@ class QuotaManager(object):
                     db_infos = self.storage.query(code,start,end)
                     if (db_infos is not None and len(db_infos) > 0):
                         history = list(filter(lambda h: list(filter(lambda d:d.day == h.day,db_infos))  == [],history))
+                except Exception as e:
+                    print('error:',e)
                 finally:
                     self.storage.insert_many(code,history)
                     print("%s saved %i records" % (code,len(history)))
