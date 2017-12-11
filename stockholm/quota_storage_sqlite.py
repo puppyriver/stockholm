@@ -57,7 +57,7 @@ class QuotaStorage :
         conn = sqlite3.connect(os.path.join(self.root, '%s.db') % code)
         conn.row_factory = dict_factory
         cursor = conn.cursor()
-        cursor.execute('SELECT * FROM DAY_INFO WHERE DAY >= ? AND DAY <= ?',(start,end))
+        cursor.execute('SELECT * FROM DAY_INFO WHERE DAY >= ? AND DAY <= ? ORDER BY DAY',(start,end))
         rows = cursor.fetchall()
         day_infos = []
         for row in rows:

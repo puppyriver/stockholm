@@ -33,8 +33,22 @@ class QuotaManager(object):
                 code = "sz"+code[:6]
             history = self.agent.fetchHistory(code, start, end)
             if history is not None:
+                db_infos = self.storage.query(code,start,end)
+                if (db_infos is not None and len(db_infos) > 0):
+                    history = list(filter(lambda h: list(filter(lambda d:d.day == h.day,db_infos))  == [],history))
                 self.storage.insert_many(code,history)
                 print("%s saved %i records" % (code,len(history)))
+
+    def load_nows(self):
+        symbols = self.load_all_quote_symbol()
+        for symbol in symbols:
+            code = symbol['Symbol']
+            if code.endswith("SS"):
+                code = "sh" + code[:6]
+            if code.endswith("SZ"):
+                code = "sz" + code[:6]
+            now = self.agent.fetchDayInfo(code)
+                    
 
     def load_all_quote_symbol(self):
         print("load_all_quote_symbol start..." + "\n")
@@ -82,5 +96,5 @@ class QuotaManager(object):
 if __name__ == '__main__':
     qm = QuotaManager(QuotaAgent(),QuotaStorage())
     t1 = time.time();
-    qm.load_history(19900101,20171212)
+    qm.load_history(20171201,20171212)
     print("spend "+str(time.time()-t1)+" seconds")

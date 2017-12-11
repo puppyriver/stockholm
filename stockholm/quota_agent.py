@@ -46,7 +46,7 @@ class QuotaAgent :
                     low = float(day[5])
                     high = float(day[6])
                     volume = int(day[7])
-                    day_no = day[0].replace('-','')
+                    day_no = int(day[0].replace('-',''))
                     day_info = DayInfo(code,day_no, open, now, low, high, pre_close, volume)
                     history.append(day_info)
 
