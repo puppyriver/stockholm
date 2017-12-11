@@ -34,11 +34,13 @@ class QuotaManager(object):
                 code = "sz"+code[:6]
             history = self.agent.fetchHistory(code, start, end)
             if history is not None:
-                db_infos = self.storage.query(code,start,end)
-                if (db_infos is not None and len(db_infos) > 0):
-                    history = list(filter(lambda h: list(filter(lambda d:d.day == h.day,db_infos))  == [],history))
-                self.storage.insert_many(code,history)
-                print("%s saved %i records" % (code,len(history)))
+                try:
+                    db_infos = self.storage.query(code,start,end)
+                    if (db_infos is not None and len(db_infos) > 0):
+                        history = list(filter(lambda h: list(filter(lambda d:d.day == h.day,db_infos))  == [],history))
+                finally:
+                    self.storage.insert_many(code,history)
+                    print("%s saved %i records" % (code,len(history)))
 
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
