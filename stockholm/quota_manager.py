@@ -122,6 +122,9 @@ if __name__ == '__main__':
             elif now.hour >= 9 and now.hour <= 15:
                 qm.load_nows()
             time.sleep(60)
-
+    elif (args["type"] == 'historynow'):
+        t1 = time.time();
+        qm.load_history(20171201, 20191230)
+        print("spend " + str(time.time() - t1) + " seconds")
 
 
