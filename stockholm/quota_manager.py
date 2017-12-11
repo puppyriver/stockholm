@@ -128,7 +128,7 @@ if __name__ == '__main__':
             time.sleep(60)
     elif (args["type"] == 'historynow'):
         t1 = time.time();
-        qm.load_history(20171201, 20191230)
+        qm.load_history(19900101, 20191230)
         print("spend " + str(time.time() - t1) + " seconds")
 
 
