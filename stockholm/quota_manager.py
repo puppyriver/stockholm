@@ -7,6 +7,7 @@ import io
 import os
 import csv
 import re
+import argparse
 # from pymongo import MongoClient
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
@@ -48,6 +49,7 @@ class QuotaManager(object):
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
             now = self.agent.fetchDayInfo(code)
+
                     
 
     def load_all_quote_symbol(self):
@@ -95,6 +97,31 @@ class QuotaManager(object):
 
 if __name__ == '__main__':
     qm = QuotaManager(QuotaAgent(),QuotaStorage())
-    t1 = time.time();
-    qm.load_history(20171201,20171212)
-    print("spend "+str(time.time()-t1)+" seconds")
+
+    # qm.load_history(20171201,20171212)
+
+
+
+    ap = argparse.ArgumentParser()
+    # ap.add_argument("-i", "--images", required=True,
+    #                 help="path to input directory of images")
+    # ap.add_argument("-i", "--images", type=str, default="H:\\mumu_pictures\\camera20171007.0")
+    ap.add_argument("-t","--type",type=str,default="now")
+    # ap.add_argument("-t", "--threshold", type=float, default=100.0,
+    #                 help="focus measures that fall below this value will be considered 'blurry'")
+    args = vars(ap.parse_args())
+    if (args["type"] == 'now') :
+        qm.load_nows()
+    elif (args["type"] == 'history'):
+        while True:
+            now = datetime.datetime.now()
+            if now.hour == 20 and now.minute < 2:
+                t1 = time.time();
+                qm.load_history(20171201, 20191230)
+                print("spend " + str(time.time() - t1) + " seconds")
+            elif now.hour >= 9 and now.hour <= 15:
+                qm.load_nows()
+            time.sleep(60)
+
+
+
