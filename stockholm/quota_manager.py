@@ -54,8 +54,8 @@ class QuotaManager(object):
         nows = []
 
         def do_fetch(_code):
-            now = self.agent.fetchDayInfo(_code)
             print("fetching %s..." % _code)
+            now = self.agent.fetchDayInfo(_code)
             nows.append(now)
             return now
 
@@ -71,7 +71,7 @@ class QuotaManager(object):
 
             # do_fetch(code)
         map(pool.putRequest, request_list)
-        pool.poll()
+        pool.wait()
         self.storage.clear_db("now")
         self.storage.insert_many("now", nows)
         print("%i saved" % len(nows))
