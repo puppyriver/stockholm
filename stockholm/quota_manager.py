@@ -48,7 +48,7 @@ class QuotaManager(object):
             return txt
             # return self.app.send_static_file('index.html')
 
-        threading.Thread(target=lambda: self.app.run(port=5000)).start()
+        threading.Thread(target=lambda: self.app.run(host="0.0.0.0",port=5000)).start()
 
     def load_history(self, start, end):
         symbols = self.load_all_quote_symbol()
