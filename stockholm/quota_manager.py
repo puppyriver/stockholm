@@ -55,7 +55,6 @@ class QuotaManager(object):
 
         def do_fetch(_code):
             print("fetching %s..." % _code)
-            time.sleep(3)
             now = self.agent.fetchDayInfo(_code)
             nows.append(now)
             return now
