@@ -26,6 +26,12 @@ class QuotaStorage :
         conn.commit()
         conn.close()
 
+    def clear_db(self,code):
+        conn = sqlite3.connect(os.path.join(self.root, '%s.db') % code)
+        conn.execute("DELETE FROM DAY_INFO")
+        conn.commit()
+        conn.close()
+
     def insert_many(self,code,dayInfos):
         conn = sqlite3.connect(os.path.join(self.root, '%s.db') % code)
         conn.execute('''CREATE TABLE IF NOT EXISTS DAY_INFO 

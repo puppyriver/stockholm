@@ -46,6 +46,7 @@ class QuotaManager(object):
 
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
+        nows = []
         for symbol in symbols:
             code = symbol['Symbol']
             if code.endswith("SS"):
@@ -53,6 +54,11 @@ class QuotaManager(object):
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
             now = self.agent.fetchDayInfo(code)
+            nows.append(now)
+        self.storage.clear_db("now")
+        self.storage.insert_many("now",nows)
+        print("%i saved" % len(nows))
+        return nows
 
                     
 
@@ -115,7 +121,9 @@ if __name__ == '__main__':
     #                 help="focus measures that fall below this value will be considered 'blurry'")
     args = vars(ap.parse_args())
     if (args["type"] == 'now') :
+        t1 = time.time();
         qm.load_nows()
+        print("spend " + str(time.time() - t1) + " seconds")
     elif (args["type"] == 'history'):
         while True:
             now = datetime.datetime.now()
