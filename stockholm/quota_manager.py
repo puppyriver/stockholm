@@ -67,7 +67,7 @@ class QuotaManager(object):
                 code = "sh" + code[:6]
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
-            request_list.append(threadpool.makeRequests(do_fetch,[((code,),{})],lambda result:print(result)))
+            request_list.extend(threadpool.makeRequests(do_fetch,[((code,),{})],lambda result:print(result)))
 
             # do_fetch(code)
         map(pool.putRequest, request_list)
