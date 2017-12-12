@@ -47,6 +47,13 @@ class QuotaManager(object):
                     self.storage.insert_many(code, history)
                     print("%s saved %i records" % (code, len(history)))
 
+    def analyst_now(self):
+        nows = self.storage.query("now")
+        for now in nows:
+            history = self.storage.query(now.code,201700830,20171231)
+            if min(list(map(lambda n:n.volume,history))) > now.volume:
+                print(now.code)
+
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
         pool = threadpool.ThreadPool(10)
@@ -153,3 +160,5 @@ if __name__ == '__main__':
         t1 = time.time();
         qm.load_history(19900101, 20191230)
         print("spend " + str(time.time() - t1) + " seconds")
+    elif (args['type'] == 'analyst'):
+        qm.analyst_now()
