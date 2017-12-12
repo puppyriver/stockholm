@@ -50,9 +50,17 @@ class QuotaManager(object):
     def analyst_now(self):
         nows = self.storage.query("now")
         for now in nows:
-            history = self.storage.query(now.code,201700830,20171231)
-            if min(list(map(lambda n:n.volume,history))) > now.volume:
-                print(now.code)
+            try:
+                history = self.storage.query(now.code,20170608,20171231)
+                min_volume = min(list(map(lambda n: n.volume, history)))
+                min_close = min(list(map(lambda n: n.close, history)))
+                if (len(history) > 15):
+                    min_close = min(list(map(lambda n: n.close, history))[-10:])
+
+                if len(history) > 10 and min_volume > (now.volume * 2 / 100) and min_close > now.close:
+                    print(now.code,min_volume,now.volume/100)
+            except Exception as e:
+                print("Error load : %s" % now.code,e)
 
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
