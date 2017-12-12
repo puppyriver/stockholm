@@ -8,14 +8,16 @@ import os
 import csv
 import re
 import argparse
+import threadpool
 # from pymongo import MongoClient
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
-from quota_agent import  QuotaAgent
+from quota_agent import QuotaAgent
 from quota_storage_sqlite import QuotaStorage
-class QuotaManager(object):
 
-    def __init__(self, agent,storage):
+
+class QuotaManager(object):
+    def __init__(self, agent, storage):
         self.all_quotes_url = 'http://money.finance.sina.com.cn/d/api/openapi_proxy.php'
         self.index_array = ['000001.SS', '399001.SZ', '000300.SS']
         self.sh000001 = {'Symbol': '000001.SS', 'Name': '上证指数'}
@@ -24,44 +26,55 @@ class QuotaManager(object):
         self.agent = agent
         self.storage = storage
 
-    def load_history(self,start,end):
+    def load_history(self, start, end):
         symbols = self.load_all_quote_symbol()
-        for symbol in symbols:
-            code = symbol['Symbol']
-            if code.endswith("SS"):
-                code = "sh"+code[:6]
-            if code.endswith("SZ"):
-                code = "sz"+code[:6]
-            history = self.agent.fetchHistory(code, start, end)
-            if history is not None:
-                try:
-                    db_infos = self.storage.query(code,start,end)
-                    if (db_infos is not None and len(db_infos) > 0):
-                        history = list(filter(lambda h: list(filter(lambda d:d.day == h.day,db_infos))  == [],history))
-                except Exception as e:
-                    print('error:',e)
-                finally:
-                    self.storage.insert_many(code,history)
-                    print("%s saved %i records" % (code,len(history)))
-
-    def load_nows(self):
-        symbols = self.load_all_quote_symbol()
-        nows = []
         for symbol in symbols:
             code = symbol['Symbol']
             if code.endswith("SS"):
                 code = "sh" + code[:6]
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
-            now = self.agent.fetchDayInfo(code)
-            print("fetching %s..." % code)
+            history = self.agent.fetchHistory(code, start, end)
+            if history is not None:
+                try:
+                    db_infos = self.storage.query(code, start, end)
+                    if (db_infos is not None and len(db_infos) > 0):
+                        history = list(
+                            filter(lambda h: list(filter(lambda d: d.day == h.day, db_infos)) == [], history))
+                except Exception as e:
+                    print('error:', e)
+                finally:
+                    self.storage.insert_many(code, history)
+                    print("%s saved %i records" % (code, len(history)))
+
+    def load_nows(self):
+        symbols = self.load_all_quote_symbol()
+        pool = threadpool.ThreadPool(10)
+
+        nows = []
+
+        def do_fetch(_code):
+            now = self.agent.fetchDayInfo(_code)
+            print("fetching %s..." % _code)
             nows.append(now)
+
+        request_list = []
+
+        for symbol in symbols:
+            code = symbol['Symbol']
+            if code.endswith("SS"):
+                code = "sh" + code[:6]
+            if code.endswith("SZ"):
+                code = "sz" + code[:6]
+            request_list.append(threadpool.makeRequests(do_fetch,[((code,),{})]))
+
+            # do_fetch(code)
+        map(pool.putRequest, request_list)
+        pool.poll()
         self.storage.clear_db("now")
-        self.storage.insert_many("now",nows)
+        self.storage.insert_many("now", nows)
         print("%i saved" % len(nows))
         return nows
-
-                    
 
     def load_all_quote_symbol(self):
         print("load_all_quote_symbol start..." + "\n")
@@ -107,7 +120,7 @@ class QuotaManager(object):
 
 
 if __name__ == '__main__':
-    qm = QuotaManager(QuotaAgent(),QuotaStorage())
+    qm = QuotaManager(QuotaAgent(), QuotaStorage())
 
     # qm.load_history(20171201,20171212)
 
@@ -117,11 +130,11 @@ if __name__ == '__main__':
     # ap.add_argument("-i", "--images", required=True,
     #                 help="path to input directory of images")
     # ap.add_argument("-i", "--images", type=str, default="H:\\mumu_pictures\\camera20171007.0")
-    ap.add_argument("-t","--type",type=str,default="now")
+    ap.add_argument("-t", "--type", type=str, default="now")
     # ap.add_argument("-t", "--threshold", type=float, default=100.0,
     #                 help="focus measures that fall below this value will be considered 'blurry'")
     args = vars(ap.parse_args())
-    if (args["type"] == 'now') :
+    if (args["type"] == 'now'):
         t1 = time.time();
         qm.load_nows()
         print("spend " + str(time.time() - t1) + " seconds")
@@ -139,5 +152,3 @@ if __name__ == '__main__':
         t1 = time.time();
         qm.load_history(19900101, 20191230)
         print("spend " + str(time.time() - t1) + " seconds")
-
-

@@ -28,9 +28,14 @@ class QuotaStorage :
 
     def clear_db(self,code):
         conn = sqlite3.connect(os.path.join(self.root, '%s.db') % code)
-        conn.execute("DELETE FROM DAY_INFO")
-        conn.commit()
-        conn.close()
+        try:
+            conn.execute("DELETE FROM DAY_INFO")
+        except Exception as e:
+            print('error:')
+            print(e)
+        finally:
+            conn.commit()
+            conn.close()
 
     def insert_many(self,code,dayInfos):
         conn = sqlite3.connect(os.path.join(self.root, '%s.db') % code)
