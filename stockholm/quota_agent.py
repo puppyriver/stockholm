@@ -7,7 +7,6 @@ class QuotaAgent :
         r_params = {'list': code}
         r = requests.get(self.real_time_url, params=r_params)
         if (r.status_code == 200):
-            print(r.text)
             text = r.text
             text = text[ text.index("\"")+1:text.rindex("\"")]
             values = text.split(",")

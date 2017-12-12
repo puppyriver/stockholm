@@ -54,6 +54,7 @@ class QuotaManager(object):
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
             now = self.agent.fetchDayInfo(code)
+            print("fetching %s..." % code)
             nows.append(now)
         self.storage.clear_db("now")
         self.storage.insert_many("now",nows)
