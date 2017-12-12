@@ -72,7 +72,7 @@ class QuotaStorage :
         rows = cursor.fetchall()
         day_infos = []
         for row in rows:
-            di = DayInfo(row["code"], row["day"], row["open"], row["close"], row["low"], row["high"],round(float( row["close"]) / (float(row["rate"])/100+1),2),
+            di = DayInfo(row["code"], row["day"], row["open"], row["close"], row["low"], row["high"],round(float( row["close"]) / ((float(row["rate"])/100)+1),2),
                     row["volume"])
             di.rate = row["rate"]
             day_infos.append(di)
