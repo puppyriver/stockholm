@@ -9,14 +9,19 @@ import csv
 import re
 import argparse
 import threadpool
+import codecs
+from flask import Flask
 # from pymongo import MongoClient
 from multiprocessing.dummy import Pool as ThreadPool
 from functools import partial
 from quota_agent import QuotaAgent
 from quota_storage_sqlite import QuotaStorage
+import threading
 
 
 class QuotaManager(object):
+    app = Flask(__name__)
+    analyst = []
     def __init__(self, agent, storage):
         self.all_quotes_url = 'http://money.finance.sina.com.cn/d/api/openapi_proxy.php'
         self.index_array = ['000001.SS', '399001.SZ', '000300.SS']
@@ -25,6 +30,25 @@ class QuotaManager(object):
         self.sh000300 = {'Symbol': '000300.SS', 'Name': '沪深300'}
         self.agent = agent
         self.storage = storage
+
+    def start_app(self):
+        @self.app.route('/')
+        def index():
+            return self.app.send_static_file('index.html')
+
+        @self.app.route('/list')
+        def list_stock():
+            txt = codecs.open('static/index.html',encoding="utf-8").read()
+
+            txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/sh601006.gif"/>'
+
+            for code in self.analyst:
+                text = text+'<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif' % code
+            txt = txt+ '</div></body></html>'
+            return txt
+            # return self.app.send_static_file('index.html')
+
+        threading.Thread(target=lambda: self.app.run(port=5000)).start()
 
     def load_history(self, start, end):
         symbols = self.load_all_quote_symbol()
@@ -49,18 +73,21 @@ class QuotaManager(object):
 
     def analyst_now(self):
         nows = self.storage.query("now")
-        for now in nows:
-            try:
-                history = self.storage.query(now.code,20170608,20171231)
-                min_volume = min(list(map(lambda n: n.volume, history)))
-                min_close = min(list(map(lambda n: n.close, history)))
-                if (len(history) > 15):
-                    min_close = min(list(map(lambda n: n.close, history))[-10:])
+        if (len(nows) > 0):
+            self.analyst = []
+            for now in nows:
+                try:
+                    history = self.storage.query(now.code,20170608,20991231)
+                    min_volume = min(list(map(lambda n: n.volume, history)))
+                    min_close = min(list(map(lambda n: n.close, history)))
+                    if (len(history) > 15):
+                        min_close = min(list(map(lambda n: n.close, history))[-10:])
 
-                if len(history) > 10 and min_volume > (now.volume * 2 / 100) and min_close > now.close:
-                    print(now.code,min_volume,now.volume/100)
-            except Exception as e:
-                print("Error load : %s" % now.code,e)
+                    if len(history) > 10 and min_volume > (now.volume * 2 / 100) and min_close > now.close:
+                        print(now.code,min_volume,now.volume/100)
+                        self.analyst.append(now.code)
+                except Exception as e:
+                    print("Error load : %s" % now.code,e)
 
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
@@ -137,7 +164,6 @@ class QuotaManager(object):
 
 if __name__ == '__main__':
     qm = QuotaManager(QuotaAgent(), QuotaStorage())
-
     # qm.load_history(20171201,20171212)
 
 
@@ -155,14 +181,16 @@ if __name__ == '__main__':
         qm.load_nows()
         print("spend " + str(time.time() - t1) + " seconds")
     elif (args["type"] == 'history'):
+        qm.start_app()
         while True:
             now = datetime.datetime.now()
             if now.hour == 20 and now.minute < 2:
                 t1 = time.time();
                 qm.load_history(20171201, 20191230)
                 print("spend " + str(time.time() - t1) + " seconds")
-            elif now.hour >= 9 and now.hour <= 15:
+            elif now.hour == 14 and now.minute < 2:
                 qm.load_nows()
+                qm.analyst_now()
             time.sleep(60)
     elif (args["type"] == 'historynow'):
         t1 = time.time();
