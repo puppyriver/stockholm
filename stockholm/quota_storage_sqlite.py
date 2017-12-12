@@ -54,7 +54,7 @@ class QuotaStorage :
         conn.commit()
         conn.close()
 
-    def query(self,code,start,end):
+    def query(self,code,start=None,end=None):
         if start is None :
             start = 19900101
         if end is None :
