@@ -55,6 +55,7 @@ class QuotaManager(object):
 
         def do_fetch(_code):
             print("fetching %s..." % _code)
+            time.sleep(3)
             now = self.agent.fetchDayInfo(_code)
             nows.append(now)
             return now
@@ -67,10 +68,10 @@ class QuotaManager(object):
                 code = "sh" + code[:6]
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
-            request_list.extend(threadpool.makeRequests(do_fetch,[((code,),{})],lambda result:print(result)))
+            request_list.extend(threadpool.makeRequests(do_fetch,[((code,),{})],lambda req,result:print(result)))
 
             # do_fetch(code)
-        map(pool.putRequest, request_list)
+        list(map(pool.putRequest, request_list))
         pool.wait()
         self.storage.clear_db("now")
         self.storage.insert_many("now", nows)
