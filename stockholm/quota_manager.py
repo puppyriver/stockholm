@@ -43,7 +43,7 @@ class QuotaManager(object):
             txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/sh601006.gif"/>'
 
             for code in self.analyst:
-                text = text+'<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif' % code
+                txt = txt+'<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif' % code
             txt = txt+ '</div></body></html>'
             return txt
             # return self.app.send_static_file('index.html')
@@ -200,4 +200,5 @@ if __name__ == '__main__':
         qm.load_history(19900101, 20191230)
         print("spend " + str(time.time() - t1) + " seconds")
     elif (args['type'] == 'analyst'):
+        qm.start_app()
         qm.analyst_now()
