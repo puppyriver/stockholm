@@ -90,6 +90,9 @@ class QuotaManager(object):
                         self.analyst.append(now.code)
                 except Exception as e:
                     print("Error load : %s" % now.code, e)
+        else:
+            print("nows = %i" % len(nows))
+
 
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
