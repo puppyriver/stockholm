@@ -22,6 +22,7 @@ import threading
 class QuotaManager(object):
     app = Flask(__name__)
     analyst = []
+
     def __init__(self, agent, storage):
         self.all_quotes_url = 'http://money.finance.sina.com.cn/d/api/openapi_proxy.php'
         self.index_array = ['000001.SS', '399001.SZ', '000300.SS']
@@ -38,17 +39,17 @@ class QuotaManager(object):
 
         @self.app.route('/list')
         def list_stock():
-            txt = codecs.open('static/index.html',encoding="utf-8").read()
+            txt = codecs.open('static/index.html', encoding="utf-8").read()
 
             txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/sh601006.gif"/>'
 
             for code in self.analyst:
-                txt = txt+'<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif' % code
-            txt = txt+ '</div></body></html>'
+                txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif' % code
+            txt = txt + '</div></body></html>'
             return txt
             # return self.app.send_static_file('index.html')
 
-        threading.Thread(target=lambda: self.app.run(host="0.0.0.0",port=5000)).start()
+        threading.Thread(target=lambda: self.app.run(host="0.0.0.0", port=5000)).start()
 
     def load_history(self, start, end):
         symbols = self.load_all_quote_symbol()
@@ -78,17 +79,17 @@ class QuotaManager(object):
             print("analyst now len = %i" % len(nows))
             for now in nows:
                 try:
-                    history = self.storage.query(now.code,20170608,20991231)
+                    history = self.storage.query(now.code, 20170608, 20991231)
                     min_volume = min(list(map(lambda n: n.volume, history)))
                     min_close = min(list(map(lambda n: n.close, history)))
                     if (len(history) > 15):
                         min_close = min(list(map(lambda n: n.close, history))[-10:])
 
                     if len(history) > 10 and min_volume > (now.volume * 2 / 100) and min_close > now.close:
-                        print(now.code,min_volume,now.volume/100)
+                        print(now.code, min_volume, now.volume / 100)
                         self.analyst.append(now.code)
                 except Exception as e:
-                    print("Error load : %s" % now.code,e)
+                    print("Error load : %s" % now.code, e)
 
     def load_nows(self):
         symbols = self.load_all_quote_symbol()
@@ -110,7 +111,7 @@ class QuotaManager(object):
                 code = "sh" + code[:6]
             if code.endswith("SZ"):
                 code = "sz" + code[:6]
-            request_list.extend(threadpool.makeRequests(do_fetch,[((code,),{})],lambda req,result:print(result)))
+            request_list.extend(threadpool.makeRequests(do_fetch, [((code,), {})], lambda req, result: print(result)))
 
             # do_fetch(code)
         list(map(pool.putRequest, request_list))
@@ -177,11 +178,9 @@ if __name__ == '__main__':
     # ap.add_argument("-t", "--threshold", type=float, default=100.0,
     #                 help="focus measures that fall below this value will be considered 'blurry'")
     args = vars(ap.parse_args())
-    if (args["type"] == 'now'):
-        t1 = time.time();
-        qm.load_nows()
-        print("spend " + str(time.time() - t1) + " seconds")
-    elif (args["type"] == 'history'):
+
+
+    def server():
         qm.start_app()
         while True:
             now = datetime.datetime.now()
@@ -195,10 +194,24 @@ if __name__ == '__main__':
                 qm.analyst_now()
                 print("analyst_now " + str(time.time() - t1) + " seconds")
             time.sleep(60)
+
+
+    if (args["type"] == 'now'):
+        t1 = time.time();
+        qm.load_nows()
+        print("spend " + str(time.time() - t1) + " seconds")
+        server()
+
+    elif (args["type"] == 'history'):
+        server()
+
     elif (args["type"] == 'historynow'):
         t1 = time.time();
         qm.load_history(19900101, 20191230)
         print("spend " + str(time.time() - t1) + " seconds")
+        server()
+
     elif (args['type'] == 'analyst'):
-        qm.start_app()
         qm.analyst_now()
+        server()
+
