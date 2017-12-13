@@ -46,7 +46,7 @@ class QuotaManager(object):
             print(len(self.analyst))
             for code in self.analyst:
                 print('code %s' % code)
-                txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif/>' % code
+                txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif" />' % code
             txt = txt + '</div></body></html>'
             return txt
             # return self.app.send_static_file('index.html')
