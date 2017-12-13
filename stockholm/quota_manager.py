@@ -42,8 +42,10 @@ class QuotaManager(object):
             txt = codecs.open('static/index.html', encoding="utf-8").read()
 
             txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/sh601006.gif"/>'
-
+            print(self.analyst)
+            print(len(self.analyst))
             for code in self.analyst:
+                print('code %s' % code)
                 txt = txt + '<img src="http://image.sinajs.cn/newchart/daily/n/%s.gif' % code
             txt = txt + '</div></body></html>'
             return txt
