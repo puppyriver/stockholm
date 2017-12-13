@@ -75,6 +75,7 @@ class QuotaManager(object):
         nows = self.storage.query("now")
         if (len(nows) > 0):
             self.analyst = []
+            print("analyst now len = %i" % len(nows))
             for now in nows:
                 try:
                     history = self.storage.query(now.code,20170608,20991231)
@@ -186,11 +187,13 @@ if __name__ == '__main__':
             now = datetime.datetime.now()
             if now.hour == 20 and now.minute < 2:
                 t1 = time.time();
-                qm.load_history(20171201, 20191230)
+                qm.load_history(20171201, 20291230)
                 print("spend " + str(time.time() - t1) + " seconds")
             elif now.hour == 14 and now.minute < 2:
+                t1 = time.time();
                 qm.load_nows()
                 qm.analyst_now()
+                print("analyst_now " + str(time.time() - t1) + " seconds")
             time.sleep(60)
     elif (args["type"] == 'historynow'):
         t1 = time.time();
