@@ -87,7 +87,7 @@ class QuotaManager(object):
                     if (len(history) > 15):
                         min_close = min(list(map(lambda n: n.close, history))[-10:])
 
-                    if len(history) > 10 and min_volume > (now.volume * 2 / 100) and min_close > now.close:
+                    if len(history) > 10 and min_volume > (now.volume * 1.6 / 100) and min_close > now.close:
                         print(now.code, min_volume, now.volume / 100)
                         self.analyst.append(now.code)
                 except Exception as e:
@@ -188,17 +188,23 @@ if __name__ == '__main__':
     def server():
         qm.start_app()
         while True:
-            now = datetime.datetime.now()
-            if now.hour == 20 and now.minute < 2:
-                t1 = time.time();
-                qm.load_history(20171201, 20291230)
-                print("spend " + str(time.time() - t1) + " seconds")
-            elif now.hour == 14 and now.minute < 2:
-                t1 = time.time();
-                qm.load_nows()
-                qm.analyst_now()
-                print("analyst_now " + str(time.time() - t1) + " seconds")
-            time.sleep(60)
+            try :
+                now = datetime.datetime.now()
+                if now.hour == 20 and now.minute < 2:
+                    t1 = time.time();
+                    qm.load_history(20171201, 20291230)
+                    print("spend " + str(time.time() - t1) + " seconds")
+
+                elif now.hour == 14 and now.minute < 2:
+                    t1 = time.time();
+                    qm.load_nows()
+                    qm.analyst_now()
+                    print("analyst_now " + str(time.time() - t1) + " seconds")
+            except Exception as e:
+                print("Error !!!",datetime.datetime.now())
+                print(e)
+            finally:
+                time.sleep(60)
 
 
     if (args["type"] == 'now'):
