@@ -34,7 +34,7 @@ def download_images(wnid,word):
 
     for image_url in image_urls:
         try:
-            file_name = line[image_url.rindex("/") + 1:]
+            file_name = image_url[image_url.rindex("/") + 1:]
             print('%s save to %s' % (image_url, file_name))
             urllib.request.urlretrieve(image_url, os.path.join(dir, file_name))
         except Exception as e:
