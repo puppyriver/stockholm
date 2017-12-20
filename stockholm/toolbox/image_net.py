@@ -49,11 +49,12 @@ root_wnid = ""
 id_word = {}
 for line in words:
     kv = line.split("\t")
-    print("k=%s v=%s" % (kv[0],kv[1]))
-    id_word[kv[0]] = kv[1]
+    # print("k=%s v=%s" % (kv[0],kv[1]))
+    id_word[kv[0]] = kv[1].strip()
 
 
 sub_ids = get_all_sub_ids("n07881800")
+print("sub_ids length = %i",len(sub_ids))
 for sub_id in sub_ids:
     word = id_word[sub_id]
     download_images(sub_id,word)
