@@ -2,7 +2,7 @@ import urllib.request
 import os
 import os.path
 
-path = 'urls/imagenet.synset.txt'
+path = 'urls/vegetable.txt'
 file_object = open(path)
 dir = path[path.rindex("/")+1:path.rindex(".")]
 if not (os.path.exists(dir)):
