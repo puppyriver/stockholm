@@ -16,6 +16,7 @@ def get_all_sub_ids(parentId):
     return sub_ids
 
 def download_images(wnid,word):
+    print("--------------------------- %s :: %s " % (wnid,word))
     image_urls = []
     f = urllib.request.urlopen(get_image_url_url % wnid)
     data = f.readlines()
