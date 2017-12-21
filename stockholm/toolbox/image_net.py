@@ -63,7 +63,7 @@ for line in words:
     id_word[kv[0]] = kv[1].strip()
 
 
-sub_ids = get_all_sub_ids("n07881800")
+sub_ids = get_all_sub_ids("n00021265")
 print("sub_ids length = %i",len(sub_ids))
 for sub_id in sub_ids:
     word = id_word[sub_id]
