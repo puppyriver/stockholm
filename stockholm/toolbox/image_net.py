@@ -54,7 +54,7 @@ def download_images(wnid, word, parent=None):
 
     dir = os.path.join(parent_dir, word)
     if not (os.path.exists(dir)):
-        os.mkdir(dir)
+        os.makedirs(dir,exist_ok=True)
     else:
         print("%s existed !" % dir)
         return
