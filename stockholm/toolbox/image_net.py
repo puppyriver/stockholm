@@ -72,7 +72,8 @@ for sub_id in sub_ids:
                                        lambda req, result: print(result),
                                        lambda req,exp : print("error download : %s %s" % (sub_id,word),exp))
     [pool.putRequest(req) for req in requests]
-    pool.wait()
+
+pool.wait()
 
     #
     # try:
