@@ -101,7 +101,7 @@ def process_node(node,parent = ""):
     node_id = node[0]
     sub_nodes = node[1]
     word = id_word[node_id]
-    make_node_task(node_id, parent)
+    make_node_task(node_id, word,parent)
     for sub_node in sub_nodes:
         process_node(sub_node,os.path.join(parent,word))
 
