@@ -1,6 +1,12 @@
 import urllib.request
 import os
 import os.path
+import socket
+import threadpool
+
+pool = threadpool.ThreadPool(15)
+socket.setdefaulttimeout(30)
+
 
 get_all_sub_id_url = "http://image-net.org/api/text/wordnet.structure.hyponym?wnid=%s&full=1"
 get_image_url_url = "http://www.image-net.org/api/text/imagenet.synset.geturls?wnid=%s"
@@ -31,6 +37,9 @@ def download_images(wnid,word):
     dir = os.path.join(image_root_dir, word)
     if not (os.path.exists(dir)):
         os.mkdir(dir)
+    else:
+        print("%s existed !" % dir)
+        return
 
     for image_url in image_urls:
         try:
@@ -39,7 +48,8 @@ def download_images(wnid,word):
             urllib.request.urlretrieve(image_url, os.path.join(dir, file_name))
         except Exception as e:
             print(e)
-            pass
+            # pass
+    return "success: %s %s" % (wnid,word)
 
 
 # aa = get_all_sub_ids("n07881800")
@@ -57,8 +67,16 @@ sub_ids = get_all_sub_ids("n07881800")
 print("sub_ids length = %i",len(sub_ids))
 for sub_id in sub_ids:
     word = id_word[sub_id]
-    try:
-        download_images(sub_id,word)
-    except Exception as e:
-        print("error download : %s %s" % (sub_id,word),e)
+
+    requests = threadpool.makeRequests(download_images,[((sub_id,word),{})],
+                                       lambda req, result: print(result),
+                                       lambda req,exp : print("error download : %s %s" % (sub_id,word),exp))
+    [pool.putRequest(req) for req in requests]
+    pool.wait()
+
+    #
+    # try:
+    #     download_images(sub_id,word)
+    # except Exception as e:
+    #     print("error download : %s %s" % (sub_id,word),e)
 
