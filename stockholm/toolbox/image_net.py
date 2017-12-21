@@ -92,8 +92,7 @@ print("sub_ids length = %i", len(sub_nodes))
 def make_node_task(sub_id, word, parent):
     requests = threadpool.makeRequests(download_images, [((sub_id, word,parent), {})],
                                        lambda req, result: print(result),
-                                       lambda req, exp: print("error download : %s %s" % (sub_id, word),
-                                                              exp.read().decode("utf-8")))
+                                       lambda req, exp: print("error download : %s %s" % (sub_id, word)))
     [pool.putRequest(req) for req in requests]
 
 
