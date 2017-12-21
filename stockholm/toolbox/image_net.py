@@ -26,14 +26,17 @@ def get_all_sub_ids(parentId):
 def get_sub_ids_tree(parentId):
     sub_ids = []
     print("open url : %s",get_sub_id_url % parentId)
-    f = urllib.request.urlopen(get_sub_id_url % parentId)
-    data = f.readlines()
-    for l in data:
-        line = str(l, "utf-8").strip()
-        if (line.startswith("-")):
-            sub_id = line[1:]
-            sub_ids.append(get_sub_ids_tree(sub_id))
-    return (parentId, sub_ids)
+    try:
+        f = urllib.request.urlopen(get_sub_id_url % parentId)
+        data = f.readlines()
+        for l in data:
+            line = str(l, "utf-8").strip()
+            if (line.startswith("-")):
+                sub_id = line[1:]
+                sub_ids.append(get_sub_ids_tree(sub_id))
+    except Exception as e:
+        print("Failed",e.read().decode("utf-8"))
+    return parentId, sub_ids
 
 
 def download_images(wnid, word, parent=None):
