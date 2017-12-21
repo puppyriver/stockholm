@@ -25,6 +25,7 @@ def get_all_sub_ids(parentId):
 
 def get_sub_ids_tree(parentId):
     sub_ids = []
+    print("open url : %s",get_sub_id_url % parentId)
     f = urllib.request.urlopen(get_sub_id_url % parentId)
     data = f.readlines()
     for l in data:
