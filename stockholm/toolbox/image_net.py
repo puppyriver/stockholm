@@ -70,7 +70,7 @@ for sub_id in sub_ids:
 
     requests = threadpool.makeRequests(download_images,[((sub_id,word),{})],
                                        lambda req, result: print(result),
-                                       lambda req,exp : print("error download : %s %s" % (sub_id,word),exp))
+                                       lambda req,exp : print("error download : %s %s" % (sub_id,word),str(exp,"utf-8")))
     [pool.putRequest(req) for req in requests]
 
 pool.wait()
