@@ -9,6 +9,7 @@ socket.setdefaulttimeout(30)
 
 
 get_all_sub_id_url = "http://image-net.org/api/text/wordnet.structure.hyponym?wnid=%s&full=1"
+get_sub_id_url = "http://image-net.org/api/text/wordnet.structure.hyponym?wnid=%s"
 get_image_url_url = "http://www.image-net.org/api/text/imagenet.synset.geturls?wnid=%s"
 
 def get_all_sub_ids(parentId):
@@ -70,7 +71,7 @@ for sub_id in sub_ids:
 
     requests = threadpool.makeRequests(download_images,[((sub_id,word),{})],
                                        lambda req, result: print(result),
-                                       lambda req,exp : print("error download : %s %s" % (sub_id,word),str(exp,"utf-8")))
+                                       lambda req,exp : print("error download : %s %s" % (sub_id,word)))
     [pool.putRequest(req) for req in requests]
 
 pool.wait()
