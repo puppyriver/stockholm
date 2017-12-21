@@ -35,7 +35,7 @@ def get_sub_ids_tree(parentId):
                 sub_id = line[1:]
                 sub_ids.append(get_sub_ids_tree(sub_id))
     except Exception as e:
-        print("Failed",e.read().decode("utf-8"))
+        print("Failed",e)
     return parentId, sub_ids
 
 
