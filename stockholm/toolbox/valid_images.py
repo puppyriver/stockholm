@@ -2,6 +2,8 @@ import imghdr
 import os
 import shutil
 
+# type = imghdr.what("bb.jpg")
+
 invalid_dest = "invalid_images"
 if not os.path.exists(invalid_dest):
     os.mkdir(invalid_dest)
@@ -13,8 +15,12 @@ for parent, dirnames, filenames  in os.walk("download_images"):
             # good image
             pass
         else:
-            # bad image
-            print("invalid image %s" % file)
-            shutil.copy(file, os.path.join(invalid_dest, image))
+            with open(file, "rb") as f:
+                bytes = f.read()
+                if not (bytes.startswith(b'\xff\xd8')):
+                    # bad image
+                    print("invalid image %s" % file)
+                    shutil.copy(file, os.path.join(invalid_dest, image))
+
 
 
