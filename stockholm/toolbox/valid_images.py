@@ -23,6 +23,7 @@ for parent, dirnames, filenames  in os.walk("download_images"):
                     print("invalid image %s" % file)
                     notImg = True
 
+
             if notImg:
                 shutil.move(file, os.path.join(invalid_dest, image))
 
