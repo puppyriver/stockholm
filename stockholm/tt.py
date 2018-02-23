@@ -1,6 +1,9 @@
 from day_info import DayInfo
 import time
 import threadpool
+import os
+print(os.path.join("ddd","abc"))
+
 
 
 def rnb(k):
