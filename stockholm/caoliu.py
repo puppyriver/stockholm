@@ -9,19 +9,30 @@ import os
 import csv
 import re
 import requests
+import urllib.request
 
 if __name__ == '__main__':
     for page in range(1,200):
-        r_params = {};
-        r = requests.get("https://t66y.com/thread0806.php?fid=25&search=&page="+str(page))
-        if (r.status_code == 200):
-            text = r.text
-            text = str(text,"utf-8")
+        url = "https://t66y.com/thread0806.php?fid=25&search=&page="+str(page);
+        # r = requests.get(url)
+        # if (r.status_code == 200):
+        #     text = r.text
+        #     text = str(text,"utf-8")
+        #     if page == 1:
+        #         print(text);
+        #     if text.find("rxrj") > 0:
+        #         print("find rxrj :"+str(page));
+        #     else:
+        #         print("not find : "+str(page));
+
+        f = urllib.request.urlopen(url)
+        data = f.readlines()
+        for l in data:
+            line = str(l, "utf-8").strip()
             if page == 1:
-                print(text);
-            if text.find("rxrj") > 0:
-                print("find rxrj :"+str(page));
+                print(line);
+            if line.find("rxrj") > 0:
+                print("find rxrj :" + str(page));
             else:
                 print("not find : "+str(page));
-
 
