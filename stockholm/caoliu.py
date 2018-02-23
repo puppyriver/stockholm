@@ -17,7 +17,7 @@ if __name__ == '__main__':
         r = requests.get(url)
         if (r.status_code == 200):
             text = r.text
-            text = str(text,"utf-8")
+            # text = str(text,"utf-8")
             if text.find("cdmindstorm") > 0:
                 print("find cdmindstorm - "+str(page))
             if text.find("rxrj") > 0:
