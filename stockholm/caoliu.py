@@ -16,6 +16,7 @@ if __name__ == '__main__':
         r = requests.get("https://t66y.com/thread0806.php?fid=25&search=&page="+str(page))
         if (r.status_code == 200):
             text = r.text
+            text = str(text,"utf-8")
             if page == 1:
                 print(text);
             if text.find("rxrj") > 0:
